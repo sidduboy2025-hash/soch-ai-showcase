@@ -43,6 +43,9 @@ export const Navbar = ({ searchQuery, onSearchChange }: NavbarProps) => {
           <Link to="/categories" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             Categories
           </Link>
+          <Link to="/upload-model" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Upload Your AI
+          </Link>
           <Button variant="ghost" size="sm" className="text-sm">
             For Teams
           </Button>
@@ -72,6 +75,9 @@ export const Navbar = ({ searchQuery, onSearchChange }: NavbarProps) => {
                 </Link>
                 <Link to="/categories" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Categories
+                </Link>
+                <Link to="/upload-model" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Upload Your AI
                 </Link>
                 <Link to="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   For Teams

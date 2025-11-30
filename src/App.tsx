@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import ModelDetail from "./pages/ModelDetail";
 import Categories from "./pages/Categories";
 import CategoryDetail from "./pages/CategoryDetail";
+import UploadModel from "./pages/UploadModel";
 import NotFound from "./pages/NotFound";
 import { Signup } from "./pages/Signup";
 import { Login } from "./pages/Login";
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/model/:slug" element={<ModelDetail />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/category/:slug" element={<CategoryDetail />} />
+            <Route path="/upload-model" element={<UploadModel />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
