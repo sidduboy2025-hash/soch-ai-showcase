@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { Sparkles, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/SearchBar";
+import { UserAvatar } from "@/components/UserAvatar";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Sheet,
   SheetContent,
@@ -14,6 +16,7 @@ interface NavbarProps {
 }
 
 export const Navbar = ({ searchQuery, onSearchChange }: NavbarProps) => {
+  const { isAuthenticated, currentUser, logout } = useAuth();
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
@@ -43,6 +46,15 @@ export const Navbar = ({ searchQuery, onSearchChange }: NavbarProps) => {
           <Button variant="ghost" size="sm" className="text-sm">
             For Teams
           </Button>
+          {isAuthenticated && currentUser ? (
+            <UserAvatar user={currentUser} />
+          ) : (
+            <Link to="/signup">
+              <Button className="bg-gradient-to-r from-primary to-blue-500 text-white hover:from-primary/90 hover:to-blue-500/90 transition-all duration-200 shadow-lg hover:shadow-xl">
+                Get Started
+              </Button>
+            </Link>
+          )}
         </div>
 
         <Sheet>
@@ -64,6 +76,32 @@ export const Navbar = ({ searchQuery, onSearchChange }: NavbarProps) => {
                 <Link to="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   For Teams
                 </Link>
+                {isAuthenticated && currentUser ? (
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center text-white font-medium text-sm">
+                        {currentUser.firstName.charAt(0)}{currentUser.lastName.charAt(0)}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{currentUser.firstName} {currentUser.lastName}</p>
+                        <p className="text-xs text-muted-foreground">{currentUser.email}</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="w-full mt-3" 
+                      onClick={logout}
+                    >
+                      Logout
+                    </Button>
+                  </div>
+                ) : (
+                  <Link to="/signup" className="mt-4">
+                    <Button className="w-full bg-gradient-to-r from-primary to-blue-500 text-white hover:from-primary/90 hover:to-blue-500/90 transition-all duration-200 shadow-lg hover:shadow-xl">
+                      Get Started
+                    </Button>
+                  </Link>
+                )}
               </nav>
             </div>
           </SheetContent>
