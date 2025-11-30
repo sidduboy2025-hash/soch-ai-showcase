@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, LogOut, Settings, UserCircle } from 'lucide-react';
 import {
   DropdownMenu,
@@ -17,8 +18,14 @@ interface UserAvatarProps {
 }
 
 export const UserAvatar: React.FC<UserAvatarProps> = ({ user }) => {
+  const navigate = useNavigate();
+
   const handleLogout = () => {
     authAPI.logout();
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
   };
 
   const getInitials = (firstName: string, lastName: string) => {
@@ -48,7 +55,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({ user }) => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem className="cursor-pointer" onClick={handleProfileClick}>
           <UserCircle className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>

@@ -13,6 +13,7 @@ import UploadModel from "./pages/UploadModel";
 import NotFound from "./pages/NotFound";
 import { Signup } from "./pages/Signup";
 import { Login } from "./pages/Login";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/categories" element={<Categories />} />
             <Route path="/category/:slug" element={<CategoryDetail />} />
             <Route path="/upload-model" element={<UploadModel />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

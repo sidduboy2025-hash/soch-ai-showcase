@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,13 +9,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, Upload, Sparkles } from "lucide-react";
+import { Plus, X, Upload, Sparkles, Loader2 } from "lucide-react";
 import { categories } from "@/data/models";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { modelsAPI, ModelUploadData } from "@/api/api-methods";
 
 export default function UploadModel() {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { isAuthenticated, currentUser } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to upload a model.",
+        variant: "destructive",
+      });
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate, toast]);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -103,7 +120,7 @@ export default function UploadModel() {
     setExamplePrompts(prev => prev.filter(p => p !== prompt));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
@@ -116,20 +133,69 @@ export default function UploadModel() {
       return;
     }
 
-    // Here you would typically send the data to your backend
-    console.log("Submitting model:", {
-      ...formData,
-      tags,
-      capabilities,
-      bestFor,
-      features,
-      examplePrompts,
-    });
+    if (!isAuthenticated) {
+      toast({
+        title: "Error",
+        description: "Please log in to upload a model.",
+        variant: "destructive",
+      });
+      navigate('/login');
+      return;
+    }
 
-    toast({
-      title: "Success!",
-      description: "Your AI model has been submitted for review.",
-    });
+    setIsLoading(true);
+
+    try {
+      const modelData: ModelUploadData = {
+        ...formData,
+        tags,
+        capabilities,
+        bestFor,
+        features,
+        examplePrompts,
+      };
+
+      const response = await modelsAPI.uploadModel(modelData);
+      
+      toast({
+        title: "Success!",
+        description: response.message || "Your AI model has been submitted for review.",
+      });
+
+      // Reset form
+      setFormData({
+        name: "",
+        shortDescription: "",
+        longDescription: "",
+        category: "",
+        provider: "",
+        pricing: "freemium",
+        modelType: "",
+        externalUrl: "",
+        isApiAvailable: false,
+        isOpenSource: false,
+      });
+      setTags([]);
+      setCapabilities([]);
+      setBestFor([]);
+      setFeatures([]);
+      setExamplePrompts([]);
+
+      // Redirect to profile to see the uploaded model
+      setTimeout(() => {
+        navigate('/profile');
+      }, 2000);
+
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload model. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -148,6 +214,12 @@ export default function UploadModel() {
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Share your AI model with the community. Fill out the form below with detailed information about your model to help users discover and understand its capabilities.
             </p>
+            {currentUser && (
+              <div className="mt-4 p-3 bg-muted/30 rounded-lg inline-flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Uploading as:</span>
+                <span className="font-medium">{currentUser.firstName} {currentUser.lastName}</span>
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
@@ -434,11 +506,22 @@ export default function UploadModel() {
             </Card>
 
             <div className="flex gap-4 justify-end">
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isLoading}>
                 Save as Draft
               </Button>
-              <Button type="submit" className="bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90">
-                Submit for Review
+              <Button 
+                type="submit" 
+                className="bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  "Submit for Review"
+                )}
               </Button>
             </div>
           </form>

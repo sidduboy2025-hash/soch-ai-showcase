@@ -33,6 +33,76 @@ export interface AuthResponse {
   };
 }
 
+// Models API types
+export interface Model {
+  id: string;
+  name: string;
+  slug: string;
+  shortDescription: string;
+  longDescription?: string;
+  category: string;
+  provider: string;
+  pricing: 'free' | 'freemium' | 'paid';
+  rating: number;
+  reviewsCount: number;
+  installsCount?: number;
+  capabilities: string[];
+  isApiAvailable: boolean;
+  isOpenSource: boolean;
+  modelType?: string;
+  externalUrl?: string;
+  tags: string[];
+  bestFor?: string[];
+  features?: string[];
+  examplePrompts?: string[];
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ModelsResponse {
+  success: boolean;
+  data: {
+    models: Model[];
+    count: number;
+  };
+}
+
+export interface ModelUploadData {
+  name: string;
+  shortDescription: string;
+  longDescription?: string;
+  category: string;
+  provider: string;
+  pricing: 'free' | 'freemium' | 'paid';
+  modelType?: string;
+  externalUrl?: string;
+  isApiAvailable: boolean;
+  isOpenSource: boolean;
+  tags: string[];
+  capabilities: string[];
+  bestFor: string[];
+  features: string[];
+  examplePrompts: string[];
+}
+
+export interface ModelUploadResponse {
+  success: boolean;
+  message: string;
+  data: {
+    model: {
+      id: string;
+      name: string;
+      slug: string;
+      shortDescription: string;
+      category: string;
+      provider: string;
+      status: string;
+      createdAt: string;
+    };
+  };
+}
+
 // Authentication API methods
 export const authAPI = {
   // Signup method
@@ -106,5 +176,37 @@ export const authAPI = {
       }
     }
     return null;
+  }
+};
+
+// Models API methods
+export const modelsAPI = {
+  // Get user's uploaded models
+  getUserModels: async (): Promise<ModelsResponse> => {
+    try {
+      const response = await apiClient.get('/api/models/my-models');
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || 
+        error.message || 
+        'Failed to fetch user models.'
+      );
+    }
+  },
+
+  // Upload a new model
+  uploadModel: async (data: ModelUploadData): Promise<ModelUploadResponse> => {
+    try {
+      const response = await apiClient.post('/api/models', data);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || 
+        error.response?.data?.errors?.join(', ') ||
+        error.message || 
+        'Failed to upload model.'
+      );
+    }
   }
 };
